@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>タスクナビ</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=M+PLUS+Rounded+1c:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
+
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('appTheme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      
+      const savedFont = localStorage.getItem('appFont');
+      if (savedFont) {
+        document.documentElement.style.setProperty('--font-family', savedFont);
+      }
+    })();
+  </script>
+
+  <style>
+    /* === 共通システム変数 === */
+    :root {
+      /* Typography */
+      --font-size-xs: 0.75rem;
+      --font-size-sm: 0.875rem;
+      --font-size-base: 1rem;
+      --font-size-lg: 1.125rem;
+      --font-size-xl: 1.25rem;
+      --font-size-2xl: 1.5rem;
+      
+      /* フォント指定: Noto Sans JPを最優先 */
+      --font-family: 'Noto Sans JP', 'BIZ UDPGothic', sans-serif;
+      
+      /* Spacing System */
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-4: 1rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-12: 3rem;
+      
+      /* Border Radius */
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      
+      /* Transitions */
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      
+      /* === カラーシステム: デフォルト (ライト) === */
+      --bg-base: #f8fafc;
+      --bg-surface: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #64748b;
+      --text-inverse: #ffffff;
+      --border: rgba(15, 23, 42, 0.1);
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      
+      --color-success: #10b981;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+      --color-info: #3b82f6;
+    }
+
+    /* === 1. ダーク === */
+    :root[data-theme="dark"] {
+      --bg-base: #1e293b;
+      --bg-surface: #334155;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-inverse: #0f172a;
+      --border: rgba(148, 163, 184, 0.2);
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      --color-success: #34d399;
+      --color-warning: #fbbf24;
+      --color-danger: #f87171;
+    }
+
+    /* === 2. オーシャン === */
+    :root[data-theme="ocean"] {
+      --bg-base: #0c4a6e;
+      --bg-surface: #075985;
+      --text-primary: #e0f2fe;
+      --text-secondary: #7dd3fc;
+      --text-inverse: #0c4a6e;
+      --border: rgba(125, 211, 252, 0.2);
+      --accent: #0284c7;
+      --accent-hover: #0ea5e9;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      --color-success: #2dd4bf;
+      --color-warning: #fbbf24;
+      --color-danger: #fb7185;
+    }
+
+    /* === 3. フォレスト === */
+    :root[data-theme="forest"] {
+      --bg-base: #14532d;
+      --bg-surface: #166534;
+      --text-primary: #ecfdf5;
+      --text-secondary: #6ee7b7;
+      --text-inverse: #14532d;
+      --border: rgba(110, 231, 183, 0.2);
+      --accent: #10b981;
+      --accent-hover: #34d399;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      --color-success: #22c55e;
+      --color-warning: #fbbf24;
+      --color-danger: #fb7185;
+    }
+
+    /* === 4. サンセット === */
+    :root[data-theme="sunset"] {
+      --bg-base: #431407;
+      --bg-surface: #7c2d12;
+      --text-primary: #fff7ed;
+      --text-secondary: #fdba74;
+      --text-inverse: #431407;
+      --border: rgba(253, 186, 116, 0.2);
+      --accent: #f97316;
+      --accent-hover: #fb923c;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      --color-success: #4ade80;
+      --color-warning: #fbbf24;
+      --color-danger: #f87171;
+    }
+
+    /* === 5. サクラ === */
+    :root[data-theme="sakura"] {
+      --bg-base: #fdf2f8;
+      --bg-surface: #ffffff;
+      --text-primary: #831843;
+      --text-secondary: #be185d;
+      --text-inverse: #ffffff;
+      --border: rgba(190, 24, 93, 0.15);
+      --accent: #ec4899;
+      --accent-hover: #f472b6;
+      --shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.15);
+      --color-success: #22c55e;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+    }
+
+    /* === Base Styles === */
+    body {
+      font-family: var(--font-family);
+      background: var(--bg-base);
+      color: var(--text-primary);
+      transition: background 0.3s ease, color 0.3s ease;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* === Layout === */
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* === Header === */
+    .header {
+      padding: var(--space-4) var(--space-6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .header__brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .header__logo {
+      color: var(--accent);
+      font-size: 1.8rem;
+    }
+
+    .header__title {
+      font-weight: 700;
+      font-size: var(--font-size-xl);
+      letter-spacing: 0.5px;
+    }
+
+    .header__actions {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    /* === Buttons === */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      transition: var(--transition-base);
+      border: none;
+      outline: none;
+      gap: var(--space-2);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn--primary {
+      background: var(--accent);
+      color: var(--text-inverse);
+    }
+    .btn--primary:hover:not(:disabled) {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn--ghost {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    .btn--ghost:hover:not(:disabled) {
+      background: rgba(0,0,0,0.05);
+      color: var(--text-primary);
+    }
+
+    .btn--icon {
+      padding: 0.5rem;
+      border-radius: 50%;
+      color: var(--text-secondary);
+      background: transparent;
+    }
+    .btn--icon:hover {
+      background: rgba(0,0,0,0.05);
+      color: var(--accent);
+    }
+
+    .btn--fab {
+      position: absolute;
+      bottom: var(--space-6);
+      right: var(--space-6);
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--text-inverse);
+      box-shadow: var(--shadow);
+      z-index: 100;
+      transition: transform 0.2s ease;
+    }
+    .btn--fab:hover {
+      transform: scale(1.05) rotate(90deg);
+    }
+
+    /* === Main Content & Filter === */
+    .filter-bar {
+      padding: var(--space-4);
+      display: flex;
+      gap: var(--space-4);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-full);
+      color: var(--text-primary);
+      font-size: var(--font-size-base);
+      transition: var(--transition-fast);
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+
+    #app-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 var(--space-4) var(--space-12); /* Bottom padding for FAB */
+    }
+
+    /* === Task List === */
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .task-card {
+      background: var(--bg-surface);
+      padding: var(--space-4);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      transition: var(--transition-fast);
+      border-left: 4px solid transparent;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .task-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .task-card.priority-high { border-left-color: var(--color-danger); }
+    .task-card.priority-medium { border-left-color: var(--color-warning); }
+    .task-card.priority-low { border-left-color: var(--color-success); }
+    .task-card.completed { opacity: 0.6; filter: grayscale(0.8); }
+    .task-card.completed .task-title { text-decoration: line-through; }
+
+    .checkbox-custom {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--text-secondary);
+      border-radius: 50%;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .task-card.completed .checkbox-custom {
+      background: var(--color-success);
+      border-color: var(--color-success);
+    }
+    .checkbox-custom::after {
+      content: 'check';
+      font-family: 'Material Icons';
+      color: white;
+      font-size: 16px;
+      display: none;
+    }
+    .task-card.completed .checkbox-custom::after { display: block; }
+
+    .task-info { flex: 1; }
+    .task-title { font-weight: 600; margin-bottom: var(--space-1); }
+    .task-meta { font-size: var(--font-size-xs); color: var(--text-secondary); display: flex; gap: var(--space-4); }
+
+    /* === Empty State === */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-12);
+      color: var(--text-secondary);
+    }
+    .empty-state .material-icons {
+      font-size: 4rem;
+      margin-bottom: var(--space-4);
+      opacity: 0.5;
+    }
+
+    /* === Modals === */
+    .modal {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s;
+    }
+    .modal.active { opacity: 1; visibility: visible; }
+
+    .modal-content {
+      background: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow);
+      transform: scale(0.95);
+      transition: transform 0.2s;
+    }
+    .modal.active .modal-content { transform: scale(1); }
+
+    .modal-header {
+      padding: var(--space-4) var(--space-6);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-body { padding: var(--space-6); }
+    .modal-actions {
+      padding: var(--space-4) var(--space-6);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-4);
+    }
+
+    /* === Form Elements === */
+    .form-group { margin-bottom: var(--space-6); }
+    .form-label {
+      display: block;
+      margin-bottom: var(--space-2);
+      font-weight: 600;
+      font-size: var(--font-size-sm);
+    }
+    .form-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg-base);
+      color: var(--text-primary);
+      box-sizing: border-box;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* Range Slider with labels */
+    .range-group { margin-top: var(--space-2); }
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+      margin-top: var(--space-1);
+    }
+
+    /* === Theme Selector === */
+    .theme-selector {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-2);
+    }
+    .theme-option {
+      padding: var(--space-2);
+      border-radius: var(--radius-sm);
+      text-align: center;
+      font-size: var(--font-size-xs);
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+    .theme-option.selected { border-color: var(--accent); }
+    
+    /* Hardcoded preview colors */
+    .t-light { background: #f8fafc; color: #0f172a; border: 1px solid #ddd; }
+    .t-dark { background: #1e293b; color: #f1f5f9; }
+    .t-ocean { background: #0c4a6e; color: #e0f2fe; }
+    .t-forest { background: #14532d; color: #ecfdf5; }
+    .t-sunset { background: #431407; color: #fff7ed; }
+    .t-sakura { background: #fdf2f8; color: #831843; border: 1px solid #fbcfe8; }
+
+    /* === Toast Notification === */
+    #toast-container {
+      position: fixed;
+      bottom: var(--space-6);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .toast {
+      background: var(--text-primary);
+      color: var(--bg-surface);
+      padding: 12px 24px;
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      min-width: 300px;
+      justify-content: space-between;
+      animation: slideUp 0.3s ease;
+    }
+    .toast-action {
+      color: var(--accent);
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: var(--font-size-sm);
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* === Loader === */
+    #app-loading {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--bg-base);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #app-loading.hidden {
+      opacity: 0; visibility: hidden; pointer-events: none;
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 4px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .loading-logo { font-size: 3rem; color: var(--accent); margin-bottom: var(--space-4); }
+
+    /* Driver.js Custom Override */
+    .driver-popover.driverjs-theme {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app-loading">
+    <div class="loading-logo"><span class="material-icons" style="font-size: 4rem;">check_circle_outline</span></div>
+    <div class="loading-text">タスクナビ</div>
+  </div>
+
+  <div class="container">
+    <header class="header" id="header-step">
+      <div class="header__brand">
+        <span class="material-icons header__logo">check_circle</span>
+        <div class="header__title">タスクナビ</div>
+      </div>
+      <div class="header__actions">
+        <button class="btn btn--icon" onclick="openSettingsModal()" title="設定" id="settings-step">
+          <span class="material-icons">settings</span>
+        </button>
+        <button class="btn btn--icon" onclick="startTour()" title="ヘルプ">
+          <span class="material-icons">help_outline</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="filter-bar" id="filter-step">
+      <input type="text" class="search-input" id="searchInput" placeholder="タスクを検索..." autocomplete="off">
+    </div>
+
+    <main id="app-content">
+      <div id="taskList" class="task-list">
+        </div>
+    </main>
+
+    <button class="btn btn--fab" onclick="openTaskModal()" title="タスクを追加" id="add-btn-step">
+      <span class="material-icons">add</span>
+    </button>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>設定</h3>
+        <button class="btn btn--icon" onclick="closeModal('settingsModal')"><span class="material-icons">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">テーマ設定</label>
+          <div class="theme-selector" id="themeSelector">
+            <div class="theme-option t-light" onclick="setTheme('light')">ライト</div>
+            <div class="theme-option t-dark" onclick="setTheme('dark')">ダーク</div>
+            <div class="theme-option t-ocean" onclick="setTheme('ocean')">オーシャン</div>
+            <div class="theme-option t-forest" onclick="setTheme('forest')">フォレスト</div>
+            <div class="theme-option t-sunset" onclick="setTheme('sunset')">サンセット</div>
+            <div class="theme-option t-sakura" onclick="setTheme('sakura')">サクラ</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">フォント設定</label>
+          <select class="form-input" id="fontSelect" onchange="setFont(this.value)">
+            <option value="'Noto Sans JP', sans-serif">Noto Sans JP (標準)</option>
+            <option value="'BIZ UDPGothic', sans-serif">BIZ UDPGothic (データ向け)</option>
+            <option value="'M PLUS Rounded 1c', sans-serif">M PLUS Rounded 1c (ソフト)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn--ghost" onclick="resetSettings()">初期設定に戻す</button>
+        <button class="btn btn--primary" onclick="closeModal('settingsModal')">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="taskModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">新しいタスク</h3>
+        <button class="btn btn--icon" onclick="closeModal('taskModal')"><span class="material-icons">close</span></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="taskId">
+        
+        <div class="form-group">
+          <label class="form-label">タイトル <span style="color:var(--color-danger)">*</span></label>
+          <input type="text" id="taskTitle" class="form-input" placeholder="例: プレゼン資料の作成" oninput="validateForm()">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">優先度</label>
+          <input type="range" id="taskPriority" min="1" max="3" value="2" class="range-group" style="width:100%">
+          <div class="range-labels">
+            <span>低</span>
+            <span>中</span>
+            <span>高</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">期限 (任意)</label>
+          <input type="date" id="taskDueDate" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">詳細 (任意)</label>
+          <textarea id="taskDesc" class="form-input" rows="3" placeholder="詳細なメモがあれば入力してください"></textarea>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn--ghost" onclick="closeModal('taskModal')">キャンセル</button>
+        <button class="btn btn--primary" id="saveTaskBtn" onclick="submitTask()" disabled>保存する</button>
+      </div>
+    </div>
+  </div>
+
+  <footer style="text-align: center; padding: 1rem; font-size: 0.75rem; color: var(--text-secondary); opacity: 0.7;">
+    &copy; 2026 TaskNavi | Developed by GemUIUX
+  </footer>
+
+  <script>
+    /* === Global State === */
+    let allTasks = [];
+    const driver = window.driver.js.driver;
+    
+    /* === Initialization === */
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSettings();
+      fetchTasks();
+      
+      // モーダル外クリックで閉じる
+      window.onclick = (e) => {
+        if (e.target.classList.contains('modal')) {
+          e.target.classList.remove('active');
+        }
+      };
+      
+      // デバウンス検索
+      let debounceTimer;
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          renderTasks(e.target.value);
+        }, 300);
+      });
+    });
+
+    /* === Data Operations === */
+    function fetchTasks() {
+      google.script.run
+        .withSuccessHandler((tasks) => {
+          allTasks = tasks;
+          renderTasks();
+          document.getElementById('app-loading').classList.add('hidden');
+          
+          // 初回訪問チェック
+          if (!localStorage.getItem('visited')) {
+            localStorage.setItem('visited', 'true');
+            setTimeout(startTour, 1000);
+          }
+        })
+        .withFailureHandler(showError)
+        .getTasks();
+    }
+
+    function submitTask() {
+      const btn = document.getElementById('saveTaskBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px"></div> 保存中...';
+
+      const task = {
+        id: document.getElementById('taskId').value || ('task_' + new Date().getTime()),
+        title: normalizeString(document.getElementById('taskTitle').value),
+        description: document.getElementById('taskDesc').value,
+        priority: getPriorityValue(document.getElementById('taskPriority').value),
+        dueDate: document.getElementById('taskDueDate').value,
+        status: 'active' // 新規作成時はactive
+      };
+
+      google.script.run
+        .withSuccessHandler((updatedTasks) => {
+          allTasks = updatedTasks;
+          renderTasks();
+          closeModal('taskModal');
+          showToast('タスクを保存しました', 'success');
+          btn.disabled = false;
+          btn.innerHTML = '保存する';
+        })
+        .withFailureHandler((e) => {
+          showError(e);
+          btn.disabled = false;
+          btn.innerHTML = '保存する';
+        })
+        .saveTask(task);
+    }
+
+    function toggleStatus(id, currentStatus) {
+      // 楽観的UI更新（即座に反応）
+      const taskEl = document.getElementById(id);
+      if(taskEl) taskEl.classList.toggle('completed');
+
+      const isCompleted = currentStatus !== 'completed';
+      
+      google.script.run
+        .withSuccessHandler((updatedTasks) => {
+          allTasks = updatedTasks;
+          // 再描画せずにデータだけ更新（ちらつき防止）
+        })
+        .toggleTaskStatus(id, isCompleted);
+    }
+
+    /* === Logical Delete (Archive) === */
+    function confirmDelete(id) {
+      // 一時的にUIから消す
+      const taskEl = document.getElementById(id);
+      taskEl.style.display = 'none';
+
+      google.script.run
+        .withSuccessHandler((updatedTasks) => {
+          allTasks = updatedTasks;
+          renderTasks();
+          showToast('アーカイブしました', 'info', {
+            label: '元に戻す',
+            action: () => restoreTask(id)
+          });
+        })
+        .archiveTask(id);
+    }
+
+    function restoreTask(id) {
+      google.script.run
+        .withSuccessHandler((updatedTasks) => {
+          allTasks = updatedTasks;
+          renderTasks();
+          showToast('タスクを復元しました', 'success');
+        })
+        .restoreTask(id);
+    }
+
+    /* === Rendering === */
+    function renderTasks(filterText = '') {
+      const container = document.getElementById('taskList');
+      const query = normalizeString(filterText).toLowerCase();
+      
+      const filtered = allTasks.filter(t => {
+        return !t.isArchived && 
+               (t.title.toLowerCase().includes(query) || t.description.toLowerCase().includes(query));
+      });
+
+      // 並び替え: 未完了が先、その中で優先度順
+      filtered.sort((a, b) => {
+        if (a.status === b.status) {
+          const pMap = { high: 3, medium: 2, low: 1 };
+          return pMap[b.priority] - pMap[a.priority];
+        }
+        return a.status === 'completed' ? 1 : -1;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <span class="material-icons">task_alt</span>
+            <p>${filterText ? '該当するタスクが見つかりません' : 'タスクがありません。<br>右下のボタンから追加しましょう！'}</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(t => `
+        <div id="${t.id}" class="task-card ${t.status} priority-${t.priority}">
+          <div class="checkbox-custom" onclick="toggleStatus('${t.id}', '${t.status}')"></div>
+          <div class="task-info" onclick="editTask('${t.id}')">
+            <div class="task-title">${t.title}</div>
+            <div class="task-meta">
+              ${t.dueDate ? `<span>📅 ${formatDate(t.dueDate)}</span>` : ''}
+              ${t.priority === 'high' ? '<span style="color:var(--color-danger)">🔥 優先度: 高</span>' : ''}
+            </div>
+          </div>
+          <button class="btn btn--icon" onclick="confirmDelete('${t.id}')" title="アーカイブ">
+            <span class="material-icons">archive</span>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    /* === UI Helpers === */
+    function openTaskModal(taskId = null) {
+      const modal = document.getElementById('taskModal');
+      const titleEl = document.getElementById('modalTitle');
+      
+      // リセット
+      document.getElementById('taskId').value = '';
+      document.getElementById('taskTitle').value = '';
+      document.getElementById('taskDesc').value = '';
+      document.getElementById('taskPriority').value = '2'; // medium
+      document.getElementById('taskDueDate').value = '';
+      document.getElementById('saveTaskBtn').disabled = true;
+
+      if (taskId) {
+        const task = allTasks.find(t => t.id === taskId);
+        if (task) {
+          titleEl.textContent = 'タスクの編集';
+          document.getElementById('taskId').value = task.id;
+          document.getElementById('taskTitle').value = task.title;
+          document.getElementById('taskDesc').value = task.description;
+          document.getElementById('taskPriority').value = task.priority === 'high' ? 3 : (task.priority === 'low' ? 1 : 2);
+          // 日付のフォーマット調整 (YYYY-MM-DD)
+          if(task.dueDate) document.getElementById('taskDueDate').value = task.dueDate.split('T')[0];
+          document.getElementById('saveTaskBtn').disabled = false;
+        }
+      } else {
+        titleEl.textContent = '新しいタスク';
+      }
+      
+      modal.classList.add('active');
+    }
+
+    function editTask(id) {
+      openTaskModal(id);
+    }
+
+    function openSettingsModal() {
+      document.getElementById('settingsModal').classList.add('active');
+      // 現在の設定を反映
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      document.querySelectorAll('.theme-option').forEach(opt => {
+        opt.classList.remove('selected');
+        if (opt.classList.contains('t-' + currentTheme)) opt.classList.add('selected');
+      });
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    function validateForm() {
+      const title = document.getElementById('taskTitle').value;
+      document.getElementById('saveTaskBtn').disabled = title.trim() === '';
+    }
+
+    /* === Theme & Settings === */
+    function setTheme(themeName) {
+      document.documentElement.setAttribute('data-theme', themeName);
+      localStorage.setItem('appTheme', themeName);
+      
+      document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
+      document.querySelector(`.t-${themeName}`).classList.add('selected');
+    }
+
+    function setFont(fontName) {
+      document.documentElement.style.setProperty('--font-family', fontName);
+      localStorage.setItem('appFont', fontName);
+    }
+
+    function resetSettings() {
+      setTheme('light');
+      setFont("'Noto Sans JP', sans-serif");
+      document.getElementById('fontSelect').value = "'Noto Sans JP', sans-serif";
+      showToast('設定を初期化しました', 'info');
+    }
+
+    function loadSettings() {
+      const savedTheme = localStorage.getItem('appTheme') || 'light';
+      const savedFont = localStorage.getItem('appFont');
+      
+      setTheme(savedTheme);
+      if (savedFont) {
+        document.documentElement.style.setProperty('--font-family', savedFont);
+        document.getElementById('fontSelect').value = savedFont;
+      }
+    }
+
+    /* === Utils === */
+    function showToast(msg, type = 'info', action = null) {
+      const container = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.style.borderLeft = `4px solid var(--color-${type})`;
+      
+      let html = `<span>${msg}</span>`;
+      if (action) {
+        html += `<span class="toast-action">${action.label}</span>`;
+      }
+      el.innerHTML = html;
+
+      if (action) {
+        el.querySelector('.toast-action').onclick = () => {
+          action.action();
+          el.remove();
+        };
+      }
+
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        setTimeout(() => el.remove(), 300);
+      }, 4000);
+    }
+
+    function showError(e) {
+      showToast(e.message || 'エラーが発生しました', 'danger');
+    }
+
+    function normalizeString(str) {
+      // 全角英数字→半角
+      return str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s) {
+        return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+      });
+    }
+
+    function getPriorityValue(val) {
+      if (val == 3) return 'high';
+      if (val == 1) return 'low';
+      return 'medium';
+    }
+
+    function formatDate(isoString) {
+      if (!isoString) return '';
+      const d = new Date(isoString);
+      const today = new Date();
+      const diffTime = d - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+      
+      if (diffDays === 0) return '今日';
+      if (diffDays === 1) return '明日';
+      if (diffDays < 0) return '期限切れ';
+      
+      return `${d.getMonth() + 1}/${d.getDate()} (あと${diffDays}日)`;
+    }
+
+    /* === Tour === */
+    function startTour() {
+      const driverObj = driver({
+        showProgress: true,
+        allowKeyboardControl: true,
+        nextBtnText: '次へ',
+        prevBtnText: '戻る',
+        doneBtnText: '完了',
+        popoverClass: 'driverjs-theme',
+        steps: [
+          { element: '#header-step', popover: { title: 'ようこそ！', description: 'タスクナビへようこそ。ここではアプリの使い方を簡単に説明します。' } },
+          { element: '#add-btn-step', popover: { title: 'タスクの追加', description: 'このボタンを押して、新しいタスクを作成します。' } },
+          { element: '#filter-step', popover: { title: '検索', description: 'タスクが増えてきたら、ここからキーワードで検索できます。' } },
+          { element: '#settings-step', popover: { title: '自分好みに', description: 'テーマカラーやフォントを変更して、使いやすい環境に設定できます。' } },
+          { element: '#taskList', popover: { title: '完了と操作', description: 'タスクの〇をクリックして完了。クリックして編集、右側のアイコンでアーカイブできます。' } }
+        ]
+      });
+      
+      // モーダルが開いていたら閉じてからツアー開始
+      document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+      driverObj.drive();
+    }
+  </script>
+</body>
+</html>
