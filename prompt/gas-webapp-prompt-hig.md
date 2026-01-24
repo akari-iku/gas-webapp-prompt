@@ -1237,10 +1237,10 @@ AIは出力前に以下を確認すること:
 
 ### コード.gs (Google Apps Script)
 
-- `doGet` 関数を含み、`HtmlService` を使用して **無題.html** を表示する処理。
+- `doGet` 関数を含み、`HtmlService` を使用して **Index.html** を表示する処理。
 - その他、アプリに必要なサーバーサイド機能。
 
-### 無題.html (HTML/CSS/JS)
+### Index.html (HTML/CSS/JS)
 
 - HTML, CSS, JavaScript をすべてこの1ファイルにまとめて記述してください。
 - 外部CSS/JSファイルの読み込みではなく、`<style>`タグと`<script>`タグを使用してください。
